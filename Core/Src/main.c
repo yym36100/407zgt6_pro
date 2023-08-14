@@ -103,7 +103,8 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  HAL_UART_Transmit(&huart1, "Hello", 5, 100);
+  //HAL_UART_Transmit(&huart1, "Hello 3", 5, 100);
+  printf("uart test 4\n");
   HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
   uint16_t delay = 100;
   uint32_t t1,t2;
