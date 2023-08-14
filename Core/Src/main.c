@@ -63,6 +63,7 @@ int __io_putchar(int ch){
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+volatile uint32_t testdatai[1024*102/4];
 volatile uint32_t testdata[1024*1024/4];
 
 /* USER CODE END 0 */
@@ -110,14 +111,46 @@ int main(void)
   uint32_t t1,t2;
   uint32_t errors = 0;
 
+
+  printf("internal ram\n"
+		 "============\n");
+
+  t1=HAL_GetTick();
+   printf("SRAM write started at %d\n",t1);
+   for(int j=0;j<10;j++)
+   for(int i=0;i<102*1024/4;i++){
+ 	  testdatai[i] = i;
+   }
+   t2=HAL_GetTick();
+   printf("SRAM write finished at %d\n",t2);
+   printf("time = %d(ms) %d(kB/s)\n", t2-t1,1000000/(t2-t1));
+
+
+   t1=HAL_GetTick();
+   printf("SRAM read started at %d=\n",t1);
+   for(int j=0;j<10;j++)
+   for(int i=0;i<102*1024/4;i++){
+ 	  if(testdatai[i] != i) errors++;
+   }
+   t2=HAL_GetTick();
+   printf("SRAM read finished at %d\n",t2);
+   printf("SRAM errors %d\n",errors);
+   printf("time = %d(ms) %d(kB/s)\n", t2-t1,1000000/(t2-t1));
+
+
+   printf("external sram\n"
+   		 "==============\n");
+
+
   t1=HAL_GetTick();
   printf("SRAM write started at %d\n",t1);
+
   for(int i=0;i<1024*1024/4;i++){
 	  testdata[i] = i;
   }
   t2=HAL_GetTick();
   printf("SRAM write finished at %d\n",t2);
-  printf("time = %d(ms)\n", t2-t1);
+  printf("time = %d(ms) %d(kB/s)\n", t2-t1,1000000/(t2-t1));
 
 
   t1=HAL_GetTick();
@@ -128,7 +161,7 @@ int main(void)
   t2=HAL_GetTick();
   printf("SRAM read finished at %d\n",t2);
   printf("SRAM errors %d\n",errors);
-  printf("time = %d(ms)\n", t2-t1);
+  printf("time = %d(ms) %d(kB/s)\n", t2-t1,1000000/(t2-t1));
 
   while (1)
   {
