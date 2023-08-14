@@ -55,10 +55,15 @@ static void MX_FSMC_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
+int __io_putchar(int ch){
+	HAL_UART_Transmit(&huart1, &ch, 1, 100);
+}
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+volatile uint32_t testdata[1024*1024/4];
 
 /* USER CODE END 0 */
 
@@ -98,8 +103,32 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  HAL_UART_Transmit(&huart1, "Hello", 5, 100);
   HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
   uint16_t delay = 100;
+  uint32_t t1,t2;
+  uint32_t errors = 0;
+
+  t1=HAL_GetTick();
+  printf("SRAM write started at %d\n",t1);
+  for(int i=0;i<1024*1024/4;i++){
+	  testdata[i] = i;
+  }
+  t2=HAL_GetTick();
+  printf("SRAM write finished at %d\n",t2);
+  printf("time = %d(ms)\n", t2-t1);
+
+
+  t1=HAL_GetTick();
+  printf("SRAM read started at %d=\n",t1);
+  for(int i=0;i<1024*1024/4;i++){
+	  if(testdata[i] != i) errors++;
+  }
+  t2=HAL_GetTick();
+  printf("SRAM read finished at %d\n",t2);
+  printf("SRAM errors %d\n",errors);
+  printf("time = %d(ms)\n", t2-t1);
+
   while (1)
   {
     /* USER CODE END WHILE */
@@ -110,6 +139,7 @@ int main(void)
 	  HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
 	  HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
 	  HAL_Delay(delay);
+	  HAL_UART_Transmit(&huart1, ".", 1, 100);
   }
   /* USER CODE END 3 */
 }

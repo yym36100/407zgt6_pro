@@ -48,6 +48,8 @@ MEMORY
   CCMRAM    (xrw)    : ORIGIN = 0x10000000,   LENGTH = 64K
   RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 128K
   FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 1024K
+  
+  SRAM    (xrw)    : ORIGIN = 0x60000000,   LENGTH = 1M
 }
 
 /* Sections */
@@ -167,6 +169,19 @@ SECTIONS
     _eccmram = .;       /* create a global symbol at ccmram end */
   } >CCMRAM AT> RAM
 
+
+   .bss_sram :
+  {
+    /* This is used by the startup in order to initialize the .bss section */
+    _ssbss = .;         /* define a global symbol at bss start */
+    __sbss_start__ = _sbss;
+    *(.bss.testdata)
+    *(testdata)
+    . = ALIGN(4);
+    _esbss = .;         /* define a global symbol at bss end */
+    __sbss_end__ = _esbss;
+  } >SRAM
+  
   /* Uninitialized data section into "RAM" Ram type memory */
   . = ALIGN(4);
   .bss :
@@ -182,6 +197,8 @@ SECTIONS
     _ebss = .;         /* define a global symbol at bss end */
     __bss_end__ = _ebss;
   } >RAM
+  
+
 
   /* User_heap_stack section, used to check that there is enough "RAM" Ram  type memory left */
   ._user_heap_stack :
